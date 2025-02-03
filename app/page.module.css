@@ -32,16 +32,17 @@
   justify-content: center;
   align-items: center;
   text-align: center;
-  background-color: #efefef;
+  background-color: #515be2;
+  color: white;
   cursor: pointer;
   max-width: 600px;
   width: 120px;
-  height: 120px;
+  height: 60px;
   padding: 20px;
   transition: background-color 0.3s ease;
   font-weight: 500;
 }
 
 .category:hover {
-  background-color: #e3e3eb;
+  background-color: #3e4af1;
 }
