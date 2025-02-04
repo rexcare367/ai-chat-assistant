@@ -22,19 +22,17 @@
 .column {
   display: flex;
   flex-direction: column;
-  width: 300px;
+  width: 270px;
+  min-width: 270px;
   height: calc(100% - 40px);
   gap: 20px;
-  margin: 20px;
   justify-content: space-between;
 }
 
 .column > * {
-  border-radius: 16px;
   overflow: hidden;
   width: 100%;
   height: 100%;
-  border-radius: 16px;
 }
 .chatContainer {
   width: 100%;

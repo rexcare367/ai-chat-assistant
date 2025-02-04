@@ -5,7 +5,6 @@
   align-items: center;
   width: 100%;
   height: 100%;
-  padding: 20px;
   background-color: #efefef;
   overflow: hidden;
   position: relative;
@@ -75,4 +74,14 @@
   width: 100%;
   display: flex;
   flex-direction: column;
+}
+
+.button {
+  padding: 8px 24px;
+  background-color: #000;
+  color: white;
+  border: none;
+  font-size: 1em;
+  border-radius: 60px; /* Removed duplicate border-radius property */
+  cursor: pointer;
 }

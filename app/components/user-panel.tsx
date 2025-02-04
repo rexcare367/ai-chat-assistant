@@ -1,5 +1,6 @@
 import React from "react";
 import { useUser, useClerk } from "@clerk/nextjs";
+import styles from "./chat-history.module.css";
 
 const UserPanel = () => {
   const { user } = useUser();
@@ -16,8 +17,10 @@ const UserPanel = () => {
           gap: "0.5rem",
         }}
       >
-        <span>{user?.fullName ? user?.fullName : "Anonymouse User"}</span>
-        <span style={{ fontSize: "10px", color: "#333" }}>
+        <span style={{ fontSize: "20px" }}>
+          {user?.fullName ? user?.fullName : "Anonymouse User"}
+        </span>
+        <span style={{ fontSize: "14px", color: "#333" }}>
           {user?.emailAddresses
             ? user?.emailAddresses[0].toString()
             : "test@gmail.com"}
@@ -32,7 +35,7 @@ const UserPanel = () => {
         }}
       >
         <button
-          style={{ padding: "0.5rem", borderRadius: "10px" }}
+          className={styles.button}
           onClick={() => signOut({ redirectUrl: "/sign-in" })}
         >
           Sign Out

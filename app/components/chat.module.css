@@ -6,6 +6,7 @@
 }
 
 .inputForm {
+  position: relative;
   display: flex;
   width: 100%;
   padding: 10px;
@@ -42,13 +43,30 @@
   background-color: lightgrey;
 }
 
+.attachmentButtonContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+}
+
+.attachmentButton {
+  border-radius: 100%;
+  padding: 10px;
+}
+
+.previewImg {
+  order: 2;
+  display: flex;
+  padding: 2px 20px;
+}
+
 .messages {
   flex-grow: 1;
   overflow-y: auto;
   padding: 10px;
   display: flex;
   flex-direction: column;
-  order: 2;
+  order: 3;
   white-space: pre-wrap;
 }
 

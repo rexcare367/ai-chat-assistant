@@ -32,6 +32,8 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const file = formData.get("file") as Blob;
 
+    console.log("file :>> ", file);
+
     if (!file) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
     }
@@ -54,6 +56,8 @@ export async function POST(request: Request) {
       const data = await put(`${filename}`, fileBuffer, {
         access: "public",
       });
+
+      console.log("data :>> ", data);
 
       return NextResponse.json(data);
     } catch (error) {

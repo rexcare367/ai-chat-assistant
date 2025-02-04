@@ -1,6 +1,13 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  type ChangeEvent,
+  memo,
+} from "react";
 import styles from "./chat.module.css";
 import { AssistantStream } from "openai/lib/AssistantStream";
 import Markdown from "react-markdown";
@@ -10,11 +17,43 @@ import { RequiredActionFunctionToolCall } from "openai/resources/beta/threads/ru
 
 type MessageProps = {
   role: "user" | "assistant" | "code";
-  text: string;
+  content: any;
 };
 
-const UserMessage = ({ text }: { text: string }) => {
-  return <div className={styles.userMessage}>{text}</div>;
+const UserMessage = ({ content }: any) => {
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "flex-start",
+        alignItems: "end",
+        flexDirection: "column",
+      }}
+    >
+      {content.map((item, index) => {
+        if (item.type === "text") {
+          return (
+            <p className={styles.userMessage} key={index}>
+              {item.text}
+            </p>
+          );
+        } else if (item.type === "image_url") {
+          return (
+            <img
+              style={{
+                width: "60px",
+                height: "60px",
+              }}
+              key={index}
+              src={item.image_url.url}
+              alt="user upload"
+            />
+          );
+        }
+        return null;
+      })}
+    </div>
+  );
 };
 
 const AssistantMessage = ({ text }: { text: string }) => {
@@ -38,14 +77,15 @@ const CodeMessage = ({ text }: { text: string }) => {
   );
 };
 
-const Message = ({ role, text }: MessageProps) => {
+const Message = ({ role, content }: MessageProps) => {
+  console.log("content :>> ", content);
   switch (role) {
     case "user":
-      return <UserMessage text={text} />;
+      return <UserMessage content={content} />;
     case "assistant":
-      return <AssistantMessage text={text} />;
+      return <AssistantMessage text={content[0].text} />;
     case "code":
-      return <CodeMessage text={text} />;
+      return <CodeMessage text={content[0].text} />;
     default:
       return null;
   }
@@ -62,11 +102,15 @@ const Chat = ({
 }: ChatProps) => {
   const [userInput, setUserInput] = useState("");
   const [messages, setMessages] = useState([]);
+  const [attachments, setAttachments] = useState([]);
   const [inputDisabled, setInputDisabled] = useState(false);
   const [threadId, setThreadId] = useState("");
 
   // automatically scroll to bottom of chat
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadQueue, setUploadQueue] = useState<Array<string>>([]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -86,13 +130,81 @@ const Chat = ({
     createThread();
   }, []);
 
+  const uploadFile = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch("/api/assistants/images", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const { url, pathname, contentType } = data;
+
+        return {
+          url,
+          name: pathname,
+          contentType: contentType,
+        };
+      }
+      const { error } = await response.json();
+      console.log("error :>> ", error);
+    } catch (error) {
+      console.log("error :>> ", error);
+    }
+  };
+
+  const handleFileChange = useCallback(
+    async (event: ChangeEvent<HTMLInputElement>) => {
+      const files = Array.from(event.target.files || []);
+
+      setUploadQueue(files.map((file) => file.name));
+
+      try {
+        const uploadPromises = files.map((file) => uploadFile(file));
+        const uploadedAttachments = await Promise.all(uploadPromises);
+        const successfullyUploadedAttachments = uploadedAttachments.filter(
+          (attachment) => attachment !== undefined
+        );
+
+        console.log(
+          "successfullyUploadedAttachments :>> ",
+          successfullyUploadedAttachments
+        );
+
+        setAttachments((currentAttachments) => [
+          ...currentAttachments,
+          ...successfullyUploadedAttachments,
+        ]);
+      } catch (error) {
+        console.error("Error uploading files!", error);
+      } finally {
+        setUploadQueue([]);
+      }
+    },
+    [setAttachments]
+  );
+
   const sendMessage = async (text) => {
+    let content: any = [{ type: "text", text }];
+    if (attachments.length > 0) {
+      content = [
+        ...content,
+        ...attachments.map((attachment) => ({
+          type: "image_url",
+          image_url: { url: attachment.url },
+        })),
+      ];
+    }
     const response = await fetch(
       `/api/assistants/threads/${threadId}/messages`,
       {
         method: "POST",
         body: JSON.stringify({
-          content: text,
+          content,
         }),
       }
     );
@@ -121,12 +233,21 @@ const Chat = ({
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!userInput.trim()) return;
+    let content: any = [{ type: "text", text: userInput }];
+    if (attachments.length > 0) {
+      content = [
+        ...content,
+        ...attachments.map((attachment) => ({
+          type: "image_url",
+          image_url: { url: attachment.url },
+        })),
+      ];
+    }
+
     sendMessage(userInput);
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { role: "user", text: userInput },
-    ]);
+    setMessages((prevMessages) => [...prevMessages, { role: "user", content }]);
     setUserInput("");
+    setAttachments([]);
     setInputDisabled(true);
     scrollToBottom();
   };
@@ -142,7 +263,7 @@ const Chat = ({
   const handleTextDelta = (delta) => {
     if (delta.value != null) {
       appendToLastMessage(delta.value);
-    };
+    }
     if (delta.annotations != null) {
       annotateLastMessage(delta.annotations);
     }
@@ -151,7 +272,7 @@ const Chat = ({
   // imageFileDone - show image in chat
   const handleImageFileDone = (image) => {
     appendToLastMessage(`\n![${image.file_id}](/api/files/${image.file_id})\n`);
-  }
+  };
 
   // toolCallCreated - log new tool call
   const toolCallCreated = (toolCall) => {
@@ -219,14 +340,17 @@ const Chat = ({
       const lastMessage = prevMessages[prevMessages.length - 1];
       const updatedLastMessage = {
         ...lastMessage,
-        text: lastMessage.text + text,
+        content: [{ type: "text", text: lastMessage.content[0].text + text }],
       };
       return [...prevMessages.slice(0, -1), updatedLastMessage];
     });
   };
 
   const appendMessage = (role, text) => {
-    setMessages((prevMessages) => [...prevMessages, { role, text }]);
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { role, content: [{ type: "text", text }] },
+    ]);
   };
 
   const annotateLastMessage = (annotations) => {
@@ -236,30 +360,80 @@ const Chat = ({
         ...lastMessage,
       };
       annotations.forEach((annotation) => {
-        if (annotation.type === 'file_path') {
-          updatedLastMessage.text = updatedLastMessage.text.replaceAll(
+        if (annotation.type === "file_path") {
+          updatedLastMessage.content.text = updatedLastMessage.text.replaceAll(
             annotation.text,
             `/api/files/${annotation.file_path.file_id}`
           );
         }
-      })
+      });
       return [...prevMessages.slice(0, -1), updatedLastMessage];
     });
-    
+  };
+
+  function PureAttachmentsButton({
+    fileInputRef,
+    isLoading,
+  }: {
+    fileInputRef: React.MutableRefObject<HTMLInputElement | null>;
+    isLoading: boolean;
+  }) {
+    return (
+      <button
+        className={styles.button}
+        onClick={(event) => {
+          event.preventDefault();
+          fileInputRef.current?.click();
+        }}
+        disabled={isLoading}
+      >
+        upload
+      </button>
+    );
   }
+
+  const AttachmentsButton = memo(PureAttachmentsButton);
 
   return (
     <div className={styles.chatContainer}>
       <div className={styles.messages}>
         {messages.map((msg, index) => (
-          <Message key={index} role={msg.role} text={msg.text} />
+          <Message key={index} role={msg.role} content={msg.content} />
         ))}
         <div ref={messagesEndRef} />
       </div>
+      <div className={styles.previewImg}>
+        {attachments.map((attachment, index) => {
+          return (
+            <img
+              style={{ width: "60px", height: "60px" }}
+              key={index}
+              src={attachment.url}
+              alt="attt"
+            />
+          );
+        })}
+      </div>
+
+      <input
+        type="file"
+        style={{
+          display: "none",
+        }}
+        className="fixed -top-4 -left-4 size-0.5 opacity-0 pointer-events-none"
+        ref={fileInputRef}
+        multiple
+        onChange={handleFileChange}
+        tabIndex={-1}
+      />
       <form
         onSubmit={handleSubmit}
         className={`${styles.inputForm} ${styles.clearfix}`}
       >
+        <div className={styles.attachmentButtonContainer}>
+          <AttachmentsButton fileInputRef={fileInputRef} isLoading={false} />
+        </div>
+
         <input
           type="text"
           className={styles.input}
