@@ -407,6 +407,7 @@ const Chat = ({
         {attachments.map((attachment, index) => {
           return (
             <img
+              className=" rounded-md"
               style={{ width: "60px", height: "60px" }}
               key={index}
               src={attachment.url}
