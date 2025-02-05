@@ -1,6 +1,7 @@
 import React from "react";
 import { useUser, useClerk } from "@clerk/nextjs";
 import styles from "./chat-history.module.css";
+import Link from "next/link";
 
 const UserPanel = () => {
   const { user } = useUser();
@@ -34,12 +35,18 @@ const UserPanel = () => {
           alignItems: "center",
         }}
       >
-        <button
-          className={styles.button}
-          onClick={() => signOut({ redirectUrl: "/sign-in" })}
-        >
-          Sign Out
-        </button>
+        {user ? (
+          <button
+            className={styles.button}
+            onClick={() => signOut({ redirectUrl: "/sign-in" })}
+          >
+            Sign Out
+          </button>
+        ) : (
+          <Link href="/sign-in" className={styles.button}>
+            Sign In
+          </Link>
+        )}
       </div>
     </div>
   );

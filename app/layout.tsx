@@ -1,8 +1,10 @@
 import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
-import "./globals.css";
 import Warnings from "./components/warnings";
 import { assistantId } from "./assistant-config";
+
+import "./globals.css";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {

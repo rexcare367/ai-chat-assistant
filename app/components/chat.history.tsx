@@ -20,7 +20,7 @@ const ChatHistory = () => {
           display: "flex",
           justifyContent: "center",
           padding: "10px 5px",
-          borderTop: "1px solid",
+          borderTop: "1px solid white",
         }}
       >
         <UserPanel />

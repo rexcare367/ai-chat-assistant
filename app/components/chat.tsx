@@ -14,6 +14,7 @@ import Markdown from "react-markdown";
 // @ts-expect-error - no types for this yet
 import { AssistantStreamEvent } from "openai/resources/beta/assistants/assistants";
 import { RequiredActionFunctionToolCall } from "openai/resources/beta/threads/runs/runs";
+import { PaperclipIcon, ArrowUpIcon } from "./icons";
 
 type MessageProps = {
   role: "user" | "assistant" | "code";
@@ -380,14 +381,14 @@ const Chat = ({
   }) {
     return (
       <button
-        className={styles.button}
+        className="p-2 rounded-full text-black"
         onClick={(event) => {
           event.preventDefault();
           fileInputRef.current?.click();
         }}
         disabled={isLoading}
       >
-        upload
+        <PaperclipIcon />
       </button>
     );
   }
@@ -415,40 +416,52 @@ const Chat = ({
         })}
       </div>
 
-      <input
-        type="file"
-        style={{
-          display: "none",
-        }}
-        className="fixed -top-4 -left-4 size-0.5 opacity-0 pointer-events-none"
-        ref={fileInputRef}
-        multiple
-        onChange={handleFileChange}
-        tabIndex={-1}
-      />
-      <form
-        onSubmit={handleSubmit}
-        className={`${styles.inputForm} ${styles.clearfix}`}
-      >
-        <div className={styles.attachmentButtonContainer}>
+      <div className="flex flex-row gap-2 relative">
+        {/* File input and attachment button outside form */}
+        <input
+          type="file"
+          style={{
+            display: "none",
+          }}
+          className="fixed -top-4 -left-4 size-0.5 opacity-0 pointer-events-none"
+          ref={fileInputRef}
+          multiple
+          onChange={handleFileChange}
+          tabIndex={-1}
+        />
+        <div className="absolute z-10 top-4 left-3">
           <AttachmentsButton fileInputRef={fileInputRef} isLoading={false} />
         </div>
 
-        <input
-          type="text"
-          className={styles.input}
-          value={userInput}
-          onChange={(e) => setUserInput(e.target.value)}
-          placeholder="Enter your question"
-        />
-        <button
-          type="submit"
-          className={styles.button}
-          disabled={inputDisabled}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit(e);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleSubmit(e);
+            }
+          }}
+          className={`${styles.inputForm} ${styles.clearfix}`}
         >
-          Send
-        </button>
-      </form>
+          <input
+            type="text"
+            className={`${styles.input} pl-12 py-4`}
+            value={userInput}
+            onChange={(e) => setUserInput(e.target.value)}
+            placeholder="Enter your question"
+          />
+          <button
+            type="submit"
+            className={`${styles.button} absolute right-4 top-3 p-2 bg-black`}
+            disabled={inputDisabled}
+          >
+            <ArrowUpIcon />
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

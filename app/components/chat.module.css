@@ -3,21 +3,18 @@
   flex-direction: column-reverse;
   height: 100%;
   width: 100%;
+  padding: 0px 10px 20px 10px;
 }
 
 .inputForm {
   position: relative;
   display: flex;
   width: 100%;
-  padding: 10px;
-  padding-bottom: 40px;
   order: 1;
 }
 
 .input {
   flex-grow: 1;
-  padding: 16px 24px;
-  margin-right: 10px;
   border-radius: 60px;
   border: 2px solid transparent;
   font-size: 1em;
@@ -31,8 +28,6 @@
 }
 
 .button {
-  padding: 8px 24px;
-  background-color: #000;
   color: white;
   border: none;
   font-size: 1em;
