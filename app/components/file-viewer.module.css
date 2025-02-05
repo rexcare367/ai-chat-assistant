@@ -8,7 +8,7 @@
   padding: 20px;
   background-color: #efefef;
   overflow: hidden;
-  position: relative;
+  @apply relative;
 }
 
 .filesList {

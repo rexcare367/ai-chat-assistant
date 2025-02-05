@@ -396,30 +396,32 @@ const Chat = ({
     <div className={styles.chatContainer}>
       <div className={styles.messages}>
         {messages.length < 1 ? (
-          <div className="flex-1 flex items-center justify-center p-8">
-            <div className="max-w-2xl w-full p-8 text-center space-y-8 rounded-lg border bg-gradient-to-b from-primary/5 to-primary/10">
+          <div className="flex-1 flex items-center justify-center px-2 py-4 md:p-8">
+            <div className="max-w-2xl w-full px-2 py-8 md:p-8 text-center space-y-8 rounded-lg border bg-gradient-to-b from-primary/5 to-primary/10">
               <div className="space-y-4">
-                <h1 className="text-2xl font-bold">Welcome to AI Assistant</h1>
-                <p className="text-muted-foreground">
+                <h1 className="text-md md:text-2xl font-bold">
+                  Welcome to AI Assistant
+                </h1>
+                <p className="text-muted-foreground text-sm md:text-md">
                   Start a new chat to begin your AI-powered conversation.
                 </p>
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground text-sm md:text-md">
                   Ask me anything - I'm here to help!
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 text-sm text-muted-foreground">
+              <div className="grid md:grid-cols-2 grid-cols-1 gap-4 text-xs md:text-sm text-muted-foreground">
                 <div className="flex items-center gap-2 justify-center">
-                  Real-time responses
+                  * Real-time responses
                 </div>
                 <div className="flex items-center gap-2 justify-center">
-                  Smart suggestions
+                  * Smart suggestions
                 </div>
                 <div className="flex items-center gap-2 justify-center">
-                  Code assistance
+                  * Code assistance
                 </div>
                 <div className="flex items-center gap-2 justify-center">
-                  24/7 availability
+                  * 24/7 availability
                 </div>
               </div>
             </div>
@@ -445,8 +447,7 @@ const Chat = ({
         {attachments.map((attachment, index) => {
           return (
             <img
-              className=" rounded-md"
-              style={{ width: "60px", height: "60px" }}
+              className="w-[60px] h-[60px] rounded-md"
               key={index}
               src={attachment.url}
               alt="attt"

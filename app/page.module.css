@@ -6,11 +6,6 @@
   height: 100%;
   background-color: white;
 }
-.title {
-  font-size: 1.5em;
-  margin-bottom: 20px;
-  font-weight: 600;
-}
 
 .container {
   display: flex;

@@ -21,9 +21,8 @@ const Home = () => {
       }}
     >
       <div
+        className="md:w-[80%] md:h-[80%] w-[90%] h-[90%]"
         style={{
-          width: "80%",
-          height: "80%",
           background: "rgba(255, 255, 255, 0.4)",
           display: "flex",
           flexDirection: "column",
@@ -32,7 +31,9 @@ const Home = () => {
           borderRadius: "1rem",
         }}
       >
-        <div className={styles.title}>AI Assistants Chatbot</div>
+        <div className="font-bold text-2xl text-black">
+          AI Assistants Chatbot
+        </div>
         <div className={styles.container}>
           <a
             className={styles.category}
