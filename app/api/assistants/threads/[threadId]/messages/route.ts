@@ -7,7 +7,6 @@ export const runtime = "nodejs";
 export async function POST(request, { params: { threadId } }) {
   const { content } = await request.json();
 
-  console.log("content :>> ", content);
   await openai.beta.threads.messages.create(threadId, {
     role: "user",
     content: content,

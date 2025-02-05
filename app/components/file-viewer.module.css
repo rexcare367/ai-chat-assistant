@@ -19,10 +19,7 @@
   gap: 12px;
   align-items: center;
   width: 100%;
-}
-
-.grow {
-  flex-grow: 1;
+  height: 100%;
 }
 
 .fileEntry {
@@ -53,13 +50,10 @@
 }
 
 .fileUploadBtn {
-  background-color: #000;
   color: white;
   padding: 8px 24px;
   border-radius: 32px;
   text-align: center;
-  display: inline-block;
-  cursor: pointer;
 }
 
 .fileUploadInput {

@@ -14,7 +14,7 @@ import Markdown from "react-markdown";
 // @ts-expect-error - no types for this yet
 import { AssistantStreamEvent } from "openai/resources/beta/assistants/assistants";
 import { RequiredActionFunctionToolCall } from "openai/resources/beta/threads/runs/runs";
-import { PaperclipIcon, ArrowUpIcon } from "./icons";
+import { PaperclipIcon, ArrowUpIcon, LoaderIcon } from "./icons";
 
 type MessageProps = {
   role: "user" | "assistant" | "code";
@@ -79,7 +79,6 @@ const CodeMessage = ({ text }: { text: string }) => {
 };
 
 const Message = ({ role, content }: MessageProps) => {
-  console.log("content :>> ", content);
   switch (role) {
     case "user":
       return <UserMessage content={content} />;
@@ -106,6 +105,7 @@ const Chat = ({
   const [attachments, setAttachments] = useState([]);
   const [inputDisabled, setInputDisabled] = useState(false);
   const [threadId, setThreadId] = useState("");
+  const [isWaitingResponse, setIsWaitingResponse] = useState<boolean>(false);
 
   // automatically scroll to bottom of chat
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -131,7 +131,7 @@ const Chat = ({
     createThread();
   }, []);
 
-  const uploadFile = async (file: File) => {
+  const uploadImage = async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
 
@@ -165,15 +165,10 @@ const Chat = ({
       setUploadQueue(files.map((file) => file.name));
 
       try {
-        const uploadPromises = files.map((file) => uploadFile(file));
+        const uploadPromises = files.map((file) => uploadImage(file));
         const uploadedAttachments = await Promise.all(uploadPromises);
         const successfullyUploadedAttachments = uploadedAttachments.filter(
           (attachment) => attachment !== undefined
-        );
-
-        console.log(
-          "successfullyUploadedAttachments :>> ",
-          successfullyUploadedAttachments
         );
 
         setAttachments((currentAttachments) => [
@@ -200,6 +195,7 @@ const Chat = ({
         })),
       ];
     }
+    setIsWaitingResponse(true);
     const response = await fetch(
       `/api/assistants/threads/${threadId}/messages`,
       {
@@ -257,6 +253,7 @@ const Chat = ({
 
   // textCreated - create new assistant message
   const handleTextCreated = () => {
+    setIsWaitingResponse(false);
     appendMessage("assistant", "");
   };
 
@@ -428,9 +425,19 @@ const Chat = ({
             </div>
           </div>
         ) : (
-          messages.map((msg, index) => (
-            <Message key={index} role={msg.role} content={msg.content} />
-          ))
+          <React.Fragment>
+            {messages.map((msg, index) => (
+              <Message key={index} role={msg.role} content={msg.content} />
+            ))}
+            {isWaitingResponse && (
+              <div className="flex flex-row justify-start items-center gap-2">
+                <span className="animate-spin">
+                  <LoaderIcon size={26} />
+                </span>
+                <Message role="assistant" content={[{ text: "Thinking..." }]} />
+              </div>
+            )}
+          </React.Fragment>
         )}
         <div ref={messagesEndRef} />
       </div>
@@ -449,9 +456,9 @@ const Chat = ({
       </div>
 
       <div className="flex flex-row gap-2 relative">
-        {/* File input and attachment button outside form */}
         <input
           type="file"
+          accept=".png,.jpeg,.jpg"
           style={{
             display: "none",
           }}

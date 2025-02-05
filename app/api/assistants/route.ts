@@ -5,9 +5,10 @@ export const runtime = "nodejs";
 // Create a new assistant
 export async function POST() {
   const assistant = await openai.beta.assistants.create({
-    instructions: "You are a helpful assistant.",
+    instructions:
+      "You are a helpful assistant. Your response should be germany",
     name: "Quickstart Assistant",
-    model: "gpt-4o",
+    model: "gpt-4o-mini",
     tools: [
       { type: "code_interpreter" },
       {

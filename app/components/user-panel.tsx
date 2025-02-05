@@ -8,7 +8,7 @@ const UserPanel = () => {
   const { signOut } = useClerk();
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
       {isLoaded ? (
         <React.Fragment>
           <div
@@ -17,7 +17,6 @@ const UserPanel = () => {
               flexDirection: "column",
               justifyContent: "center",
               alignItems: "center",
-              gap: "0.5rem",
             }}
           >
             <span style={{ fontSize: "20px" }}>
