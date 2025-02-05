@@ -398,9 +398,40 @@ const Chat = ({
   return (
     <div className={styles.chatContainer}>
       <div className={styles.messages}>
-        {messages.map((msg, index) => (
-          <Message key={index} role={msg.role} content={msg.content} />
-        ))}
+        {messages.length < 1 ? (
+          <div className="flex-1 flex items-center justify-center p-8">
+            <div className="max-w-2xl w-full p-8 text-center space-y-8 rounded-lg border bg-gradient-to-b from-primary/5 to-primary/10">
+              <div className="space-y-4">
+                <h1 className="text-2xl font-bold">Welcome to AI Assistant</h1>
+                <p className="text-muted-foreground">
+                  Start a new chat to begin your AI-powered conversation.
+                </p>
+                <p className="text-muted-foreground">
+                  Ask me anything - I'm here to help!
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2 justify-center">
+                  Real-time responses
+                </div>
+                <div className="flex items-center gap-2 justify-center">
+                  Smart suggestions
+                </div>
+                <div className="flex items-center gap-2 justify-center">
+                  Code assistance
+                </div>
+                <div className="flex items-center gap-2 justify-center">
+                  24/7 availability
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          messages.map((msg, index) => (
+            <Message key={index} role={msg.role} content={msg.content} />
+          ))
+        )}
         <div ref={messagesEndRef} />
       </div>
       <div className={styles.previewImg}>

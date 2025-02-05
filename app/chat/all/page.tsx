@@ -6,7 +6,7 @@ import Chat from "../../components/chat";
 // import WeatherWidget from "../../components/weather-widget";
 import { getWeather } from "../../utils/weather";
 import FileViewer from "../../components/file-viewer";
-import ChatHistory from "../../components/chat.history";
+import ChatHistory from "../../components/chat-history";
 
 import ChatHeader from "../../components/chat-header";
 
