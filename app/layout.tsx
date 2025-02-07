@@ -8,8 +8,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Assistants API Quickstart",
-  description: "A quickstart template using the Assistants API with OpenAI",
+  title: "AI Chat Assistant",
+  description: "AI Chat Assistant",
   icons: {
     icon: "/openai.svg",
   },
