@@ -100,7 +100,7 @@ const ChatHistory = () => {
           height: "fit-content",
           display: "flex",
           justifyContent: "center",
-          padding: "20px 10px",
+          padding: "32px 10px",
           borderTop: "1px solid white",
         }}
       >

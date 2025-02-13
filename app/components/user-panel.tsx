@@ -11,23 +11,21 @@ const UserPanel = () => {
     <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
       {isLoaded ? (
         <React.Fragment>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <span style={{ fontSize: "20px" }}>
-              {user?.fullName ? user?.fullName : "Anonymouse User"}
-            </span>
-            <span style={{ fontSize: "14px", color: "#333" }}>
-              {user?.emailAddresses
-                ? user?.emailAddresses[0].toString()
-                : "test@gmail.com"}
-            </span>
-          </div>
+          {user && (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <span style={{ fontSize: "20px" }}>{user.fullName}</span>
+              <span style={{ fontSize: "14px", color: "#333" }}>
+                {user.emailAddresses[0].toString()}
+              </span>
+            </div>
+          )}
           <div
             style={{
               display: "flex",
