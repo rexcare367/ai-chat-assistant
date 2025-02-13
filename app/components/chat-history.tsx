@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
-import { useParams } from "next/navigation";
-import styles from "./chat-history.module.css";
-import UserPanel from "./user-panel";
-import { PlusIcon, MessageIcon } from "./icons";
 import { useAuth } from "@clerk/nextjs";
 
-const ChatHistory = () => {
-  const { slug } = useParams();
-  const a_ssistantId = slug ? slug[0] : "";
+import styles from "./chat-history.module.css";
+import { LoaderIcon, PlusIcon, AttachmentIcon } from "./icons";
 
+import UserPanel from "./user-panel";
+import ChatHistoryItem from "./chat-history-item";
+
+const ChatHistory = () => {
   const [history, setHistory] = useState([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -69,23 +67,29 @@ const ChatHistory = () => {
           </button>
         </div>
 
-        <div className="flex-1 overflow-auto p-4">
-          {history &&
-            history.map((_, i) => {
-              return (
-                <Link
-                  className={`text-black w-full justify-start gap-4 flex flex-row items-center px-5 py-2 rounded-md ${
-                    a_ssistantId === _.assistant_id ? "font-bold" : ""
-                  }`}
-                  key={i}
-                  // onClick={handleRoute}
-                  href={`/chat/all/${_.assistant_id}/${_.thread_id}`}
-                >
-                  <MessageIcon />
-                  Recent Chat {i + 1}
-                </Link>
-              );
-            })}
+        <div className="flex-1 overflow-auto p-4 h-full">
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center h-full">
+              <LoaderIcon /> Loading
+            </div>
+          ) : history.length === 0 ? (
+            <div
+              className={`flex flex-col items-center gap-4 justify-center h-full`}
+            >
+              <AttachmentIcon />
+              No Chat
+            </div>
+          ) : (
+            history &&
+            history.map((item, i) => (
+              <ChatHistoryItem
+                key={i}
+                chatHistory={item}
+                fetchHistory={fetchHistory}
+                userId={userId}
+              />
+            ))
+          )}
         </div>
       </div>
       <div

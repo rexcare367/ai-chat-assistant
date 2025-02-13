@@ -19,14 +19,16 @@ const FileViewer = () => {
       await fetchFiles();
       setIsLoading(false);
     })();
-  }, []);
+  }, [a_ssistantId]);
 
   const fetchFiles = async () => {
-    const resp = await fetch(`/api/assistants/${a_ssistantId}/files`, {
-      method: "GET",
-    });
-    const data = await resp.json();
-    setFiles(data);
+    if (a_ssistantId) {
+      const resp = await fetch(`/api/assistants/${a_ssistantId}/files`, {
+        method: "GET",
+      });
+      const data = await resp.json();
+      setFiles(data);
+    }
   };
 
   const handleFileUpload = async (event: any) => {
@@ -62,7 +64,7 @@ const FileViewer = () => {
             className={`flex flex-col items-center gap-4 justify-center h-full`}
           >
             <AttachmentIcon />
-            No documents
+            No document
           </div>
         ) : (
           files.map((file, i) => (

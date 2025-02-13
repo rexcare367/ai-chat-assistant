@@ -276,13 +276,13 @@ const Chat = ({
       ];
     }
 
+    setInputDisabled(true);
     sendMessage(content);
     setMessages((prevMessages) => [...prevMessages, { role: "user", content }]);
     await storeChat("user", userInput, attachments);
     setLastIndex((prevLastIndex) => prevLastIndex + 1);
     setUserInput("");
     setAttachments([]);
-    setInputDisabled(true);
     scrollToBottom();
   };
 
@@ -513,53 +513,54 @@ const Chat = ({
           );
         })}
       </div>
+      {a_ssistantId && (
+        <div className="flex flex-row gap-2 relative">
+          <input
+            type="file"
+            accept=".png,.jpeg,.jpg"
+            style={{
+              display: "none",
+            }}
+            className="fixed -top-4 -left-4 size-0.5 opacity-0 pointer-events-none"
+            ref={fileInputRef}
+            multiple
+            onChange={handleFileChange}
+            tabIndex={-1}
+          />
+          <div className="absolute z-10 top-4 left-3">
+            <AttachmentsButton fileInputRef={fileInputRef} isLoading={false} />
+          </div>
 
-      <div className="flex flex-row gap-2 relative">
-        <input
-          type="file"
-          accept=".png,.jpeg,.jpg"
-          style={{
-            display: "none",
-          }}
-          className="fixed -top-4 -left-4 size-0.5 opacity-0 pointer-events-none"
-          ref={fileInputRef}
-          multiple
-          onChange={handleFileChange}
-          tabIndex={-1}
-        />
-        <div className="absolute z-10 top-4 left-3">
-          <AttachmentsButton fileInputRef={fileInputRef} isLoading={false} />
-        </div>
-
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSubmit(e);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
+          <form
+            onSubmit={(e) => {
               e.preventDefault();
               handleSubmit(e);
-            }
-          }}
-          className={`${styles.inputForm} ${styles.clearfix}`}
-        >
-          <input
-            type="text"
-            className={`${styles.input} pl-12 py-4`}
-            value={userInput}
-            onChange={(e) => setUserInput(e.target.value)}
-            placeholder="Enter your question"
-          />
-          <button
-            type="submit"
-            className={`${styles.button} absolute right-4 top-3 p-2 bg-black`}
-            disabled={inputDisabled}
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleSubmit(e);
+              }
+            }}
+            className={`${styles.inputForm} ${styles.clearfix}`}
           >
-            <ArrowUpIcon />
-          </button>
-        </form>
-      </div>
+            <input
+              type="text"
+              className={`${styles.input} pl-12 py-4`}
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
+              placeholder="Enter your question"
+            />
+            <button
+              type="submit"
+              className={`${styles.button} absolute right-4 top-3 p-2 bg-black`}
+              disabled={inputDisabled}
+            >
+              <ArrowUpIcon />
+            </button>
+          </form>
+        </div>
+      )}
     </div>
   );
 };
