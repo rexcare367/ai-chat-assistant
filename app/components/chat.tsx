@@ -8,6 +8,7 @@ import React, {
   type ChangeEvent,
   memo,
 } from "react";
+import { useParams } from "next/navigation";
 import styles from "./chat.module.css";
 import { AssistantStream } from "openai/lib/AssistantStream";
 import Markdown from "react-markdown";
@@ -22,6 +23,7 @@ type MessageProps = {
 };
 
 const UserMessage = ({ content }: any) => {
+  console.log("content :>> ", content);
   return (
     <div
       style={{
@@ -31,28 +33,29 @@ const UserMessage = ({ content }: any) => {
         flexDirection: "column",
       }}
     >
-      {content.map((item, index) => {
-        if (item.type === "text") {
-          return (
-            <p className={styles.userMessage} key={index}>
-              {item.text}
-            </p>
-          );
-        } else if (item.type === "image_url") {
-          return (
-            <img
-              style={{
-                width: "60px",
-                height: "60px",
-              }}
-              key={index}
-              src={item.image_url.url}
-              alt="user upload"
-            />
-          );
-        }
-        return null;
-      })}
+      {content &&
+        content.map((item, index) => {
+          if (item.type === "text") {
+            return (
+              <p className={styles.userMessage} key={index}>
+                {item.text}
+              </p>
+            );
+          } else if (item.type === "image_url") {
+            return (
+              <img
+                style={{
+                  width: "60px",
+                  height: "60px",
+                }}
+                key={index}
+                src={item.image_url.url}
+                alt="user upload"
+              />
+            );
+          }
+          return null;
+        })}
     </div>
   );
 };
@@ -79,6 +82,7 @@ const CodeMessage = ({ text }: { text: string }) => {
 };
 
 const Message = ({ role, content }: MessageProps) => {
+  console.log("role, content :>> ", role, content);
   switch (role) {
     case "user":
       return <UserMessage content={content} />;
@@ -98,14 +102,18 @@ type ChatProps = {
 };
 
 const Chat = ({
-  functionCallHandler = () => Promise.resolve(""), // default to return empty string
+  functionCallHandler = () => Promise.resolve(""),
 }: ChatProps) => {
+  const { slug } = useParams();
+  const a_ssistantId = slug ? slug[0] : "";
+  const a_threadId = slug ? slug[1] : "";
+
   const [userInput, setUserInput] = useState("");
   const [messages, setMessages] = useState([]);
   const [attachments, setAttachments] = useState([]);
   const [inputDisabled, setInputDisabled] = useState(false);
-  const [threadId, setThreadId] = useState("");
   const [isWaitingResponse, setIsWaitingResponse] = useState<boolean>(false);
+  const [lastIndex, setLastIndex] = useState<number>(0);
 
   // automatically scroll to bottom of chat
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -121,22 +129,18 @@ const Chat = ({
 
   // create a new threadID when chat component created
   useEffect(() => {
-    const createThread = async () => {
-      const res = await fetch(`/api/assistants/threads`, {
-        method: "POST",
-      });
-      const data = await res.json();
-      setThreadId(data.threadId);
-    };
-    createThread();
+    loadChat();
   }, []);
+
+  // create a new threadID when chat component created
+  useEffect(() => {}, []);
 
   const uploadImage = async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
 
     try {
-      const response = await fetch("/api/assistants/images", {
+      const response = await fetch(`/api/assistants/${a_ssistantId}/images`, {
         method: "POST",
         body: formData,
       });
@@ -184,20 +188,50 @@ const Chat = ({
     [setAttachments]
   );
 
-  const sendMessage = async (text) => {
-    let content: any = [{ type: "text", text }];
-    if (attachments.length > 0) {
-      content = [
-        ...content,
+  const loadChat = async () => {
+    const res = await fetch(`/api/chat-history/chat/${a_ssistantId}`);
+    const chats = await res.json();
+    console.log("chats :>> ", chats);
+    let _messages = [];
+    chats.forEach((chat) => {
+      const attachments = JSON.parse(chat.attachments);
+      _messages = [
+        ..._messages,
+        {
+          role: chat.sender,
+          content: [
+            {
+              type: "text",
+              text: chat.text,
+            },
+          ],
+        },
         ...attachments.map((attachment) => ({
           type: "image_url",
           image_url: { url: attachment.url },
         })),
       ];
-    }
+    });
+    console.log("_messages :>> ", _messages);
+    if (_messages.length) setMessages(_messages);
+    setLastIndex(_messages.length);
+  };
+
+  const storeChat = async (sender: string, text: string, attachments: any) => {
+    await fetch(`/api/chat-history/chat/${a_ssistantId}`, {
+      method: "POST",
+      body: JSON.stringify({
+        sender,
+        text: text,
+        attachments: attachments,
+      }),
+    });
+  };
+
+  const sendMessage = async (content) => {
     setIsWaitingResponse(true);
     const response = await fetch(
-      `/api/assistants/threads/${threadId}/messages`,
+      `/api/assistants/${a_ssistantId}/threads/${a_threadId}/messages`,
       {
         method: "POST",
         body: JSON.stringify({
@@ -205,13 +239,14 @@ const Chat = ({
         }),
       }
     );
+
     const stream = AssistantStream.fromReadableStream(response.body);
     handleReadableStream(stream);
   };
 
   const submitActionResult = async (runId, toolCallOutputs) => {
     const response = await fetch(
-      `/api/assistants/threads/${threadId}/actions`,
+      `/api/assistants/${a_ssistantId}/threads/${a_threadId}/actions`,
       {
         method: "POST",
         headers: {
@@ -227,7 +262,7 @@ const Chat = ({
     handleReadableStream(stream);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!userInput.trim()) return;
     let content: any = [{ type: "text", text: userInput }];
@@ -241,8 +276,10 @@ const Chat = ({
       ];
     }
 
-    sendMessage(userInput);
+    sendMessage(content);
     setMessages((prevMessages) => [...prevMessages, { role: "user", content }]);
+    await storeChat("user", userInput, attachments);
+    setLastIndex((prevLastIndex) => prevLastIndex + 1);
     setUserInput("");
     setAttachments([]);
     setInputDisabled(true);
@@ -253,7 +290,6 @@ const Chat = ({
 
   // textCreated - create new assistant message
   const handleTextCreated = () => {
-    setIsWaitingResponse(false);
     appendMessage("assistant", "");
   };
 
@@ -305,6 +341,7 @@ const Chat = ({
   // handleRunCompleted - re-enable the input form
   const handleRunCompleted = () => {
     setInputDisabled(false);
+    setIsWaitingResponse(false);
   };
 
   const handleReadableStream = (stream: AssistantStream) => {
@@ -323,9 +360,29 @@ const Chat = ({
     stream.on("event", (event) => {
       if (event.event === "thread.run.requires_action")
         handleRequiresAction(event);
-      if (event.event === "thread.run.completed") handleRunCompleted();
+      if (event.event === "thread.run.completed") {
+        handleRunCompleted();
+      }
     });
   };
+
+  useEffect(() => {
+    if (!isWaitingResponse) {
+      let _lastIndex = lastIndex;
+      (async () => {
+        for (let index = _lastIndex; index < messages.length; index++) {
+          await storeChat(
+            messages[index].role,
+            messages[index].content[0].text,
+            []
+          );
+          _lastIndex += 1;
+        }
+        setLastIndex(_lastIndex);
+      })();
+      console.log("lastIndex :>> ", lastIndex);
+    }
+  }, [isWaitingResponse]);
 
   /*
     =======================
@@ -359,10 +416,11 @@ const Chat = ({
       };
       annotations.forEach((annotation) => {
         if (annotation.type === "file_path") {
-          updatedLastMessage.content.text = updatedLastMessage.text.replaceAll(
-            annotation.text,
-            `/api/files/${annotation.file_path.file_id}`
-          );
+          updatedLastMessage.content[0].text =
+            updatedLastMessage.content[0].text.replaceAll(
+              annotation.text,
+              `/api/files/${annotation.file_path.file_id}`
+            );
         }
       });
       return [...prevMessages.slice(0, -1), updatedLastMessage];

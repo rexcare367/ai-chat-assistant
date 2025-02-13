@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import styles from "./file-viewer.module.css";
 import { TrashIcon, LoaderIcon } from "./icons";
+import { useParams } from "next/navigation";
 
 const FileItem = ({ fetchFiles, file }) => {
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const { slug } = useParams();
+  const assistantId = slug[0];
 
   const handleFileDelete = async (fileId: string) => {
     setIsDeleting(true);
-    await fetch("/api/assistants/files", {
+    await fetch(`/api/assistants/${assistantId}/files`, {
       method: "DELETE",
       body: JSON.stringify({ fileId }),
     });

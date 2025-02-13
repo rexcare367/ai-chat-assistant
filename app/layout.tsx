@@ -1,7 +1,7 @@
 import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
-import Warnings from "./components/warnings";
-import { assistantId } from "./assistant-config";
+// import Warnings from "./components/warnings";
+// import { assistantId } from "./assistant-config";
 
 import "./globals.css";
 
@@ -20,7 +20,7 @@ export default function RootLayout({ children }) {
     <ClerkProvider>
       <html lang="en">
         <body className={`${inter.className}`} style={{ height: "100vh" }}>
-          {assistantId ? children : <Warnings />}
+          {children}
         </body>
       </html>
     </ClerkProvider>
