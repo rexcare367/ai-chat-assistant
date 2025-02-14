@@ -23,7 +23,6 @@ type MessageProps = {
 };
 
 const UserMessage = ({ content }: any) => {
-  console.log("content :>> ", content);
   return (
     <div
       style={{
@@ -82,7 +81,6 @@ const CodeMessage = ({ text }: { text: string }) => {
 };
 
 const Message = ({ role, content }: MessageProps) => {
-  console.log("role, content :>> ", role, content);
   switch (role) {
     case "user":
       return <UserMessage content={content} />;
@@ -113,6 +111,7 @@ const Chat = ({
   const [attachments, setAttachments] = useState([]);
   const [inputDisabled, setInputDisabled] = useState(false);
   const [isWaitingResponse, setIsWaitingResponse] = useState<boolean>(false);
+  const [isFinisehdResponse, setisFinisehdResponse] = useState<boolean>(false);
   const [lastIndex, setLastIndex] = useState<number>(0);
 
   // automatically scroll to bottom of chat
@@ -290,6 +289,8 @@ const Chat = ({
 
   // textCreated - create new assistant message
   const handleTextCreated = () => {
+    setIsWaitingResponse(false);
+    setisFinisehdResponse(false);
     appendMessage("assistant", "");
   };
 
@@ -310,12 +311,14 @@ const Chat = ({
 
   // toolCallCreated - log new tool call
   const toolCallCreated = (toolCall) => {
+    console.log("toolCall :>> ", toolCall);
     if (toolCall.type != "code_interpreter") return;
     appendMessage("code", "");
   };
 
   // toolCallDelta - log delta and snapshot for the tool call
   const toolCallDelta = (delta, snapshot) => {
+    console.log("toolCallDelta :>> ", delta, snapshot);
     if (delta.type != "code_interpreter") return;
     if (!delta.code_interpreter.input) return;
     appendToLastMessage(delta.code_interpreter.input);
@@ -341,7 +344,7 @@ const Chat = ({
   // handleRunCompleted - re-enable the input form
   const handleRunCompleted = () => {
     setInputDisabled(false);
-    setIsWaitingResponse(false);
+    setisFinisehdResponse(true);
   };
 
   const handleReadableStream = (stream: AssistantStream) => {
@@ -367,7 +370,7 @@ const Chat = ({
   };
 
   useEffect(() => {
-    if (!isWaitingResponse) {
+    if (isFinisehdResponse) {
       let _lastIndex = lastIndex;
       (async () => {
         for (let index = _lastIndex; index < messages.length; index++) {
@@ -382,7 +385,7 @@ const Chat = ({
       })();
       console.log("lastIndex :>> ", lastIndex);
     }
-  }, [isWaitingResponse]);
+  }, [isFinisehdResponse]);
 
   /*
     =======================

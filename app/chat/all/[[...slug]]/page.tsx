@@ -3,11 +3,30 @@
 import React, { useState } from "react";
 import Chat from "../../../components/chat";
 import { getWeather } from "../../../utils/weather";
+import { getCountryInformation } from "../../../utils/country";
 
 const FunctionCalling = () => {
   const [weatherData, setWeatherData] = useState({});
 
   const functionCallHandler = async (call) => {
+    const functionName = call?.function?.name;
+    switch (functionName) {
+      case "get_weather": {
+        const args = JSON.parse(call.function.arguments);
+        const data = getWeather(args.location);
+        setWeatherData(data);
+        return JSON.stringify(data);
+      }
+      case "getCountryInformation": {
+        const args = JSON.parse(call.function.arguments);
+        const data = await getCountryInformation(args);
+        console.log("data :>> ", data);
+        // setWeatherData(data);
+        return JSON.stringify(data);
+      }
+      default:
+        break;
+    }
     if (call?.function?.name !== "get_weather") return;
     const args = JSON.parse(call.function.arguments);
     const data = getWeather(args.location);

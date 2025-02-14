@@ -1,5 +1,4 @@
 import { openai } from "@/app/openai";
-import { createClient } from "../../utils/supabase/server";
 
 export const runtime = "nodejs";
 
@@ -31,6 +30,23 @@ export async function POST(_request) {
             },
             required: ["location"],
           },
+        },
+      },
+      {
+        type: "function",
+        function: {
+          name: "getCountryInformation",
+          parameters: {
+            type: "object",
+            properties: {
+              country: {
+                type: "string",
+                description: "Country name, e.g. Sweden",
+              },
+            },
+            required: ["country"],
+          },
+          description: "Determine poulation of a country",
         },
       },
       { type: "file_search" },
