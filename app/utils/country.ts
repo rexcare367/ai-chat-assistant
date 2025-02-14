@@ -9,7 +9,7 @@ export async function getCountryInformation(params) {
       country
     )}`;
     const response = await axios.get(url);
-    // console.log(response.data); if you want to inspect the output
+    console.log(response.data);
     return JSON.stringify(response.data);
   } catch (error) {
     console.error(error);

@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 export async function POST(_request) {
   const assistant = await openai.beta.assistants.create({
     instructions:
-      "You are a helpful assistant. Your response should be germany. if user ask to generate a file, you don't need to return the source code and just return the file link",
+      "You are a helpful assistant. If user ask to generate a file, you don't need to return the source code and just return the file link. the response should be same language of last user's message",
     name: "Quickstart Assistant",
     model: "gpt-4o-mini",
     tools: [
@@ -36,6 +36,8 @@ export async function POST(_request) {
         type: "function",
         function: {
           name: "getCountryInformation",
+          description:
+            "Get detailed information of a country like position, size, population, flag and other symbols",
           parameters: {
             type: "object",
             properties: {
@@ -46,7 +48,23 @@ export async function POST(_request) {
             },
             required: ["country"],
           },
-          description: "Determine poulation of a country",
+        },
+      },
+      {
+        type: "function",
+        function: {
+          name: "liveWebSearch",
+          description: "Get the latest information to answer user's question",
+          parameters: {
+            type: "object",
+            properties: {
+              query: {
+                type: "string",
+                description: "all of user's meesage",
+              },
+            },
+            required: ["query"],
+          },
         },
       },
       { type: "file_search" },

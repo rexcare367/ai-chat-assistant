@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Chat from "../../../components/chat";
 import { getWeather } from "../../../utils/weather";
 import { getCountryInformation } from "../../../utils/country";
+import { liveWebSearch } from "../../../utils/liveWebSearch";
 
 const FunctionCalling = () => {
   const [weatherData, setWeatherData] = useState({});
@@ -24,6 +25,13 @@ const FunctionCalling = () => {
         // setWeatherData(data);
         return JSON.stringify(data);
       }
+      case "liveWebSearch": {
+        const args = JSON.parse(call.function.arguments);
+        console.log("args", args);
+        const data = await liveWebSearch(args);
+        console.log("data :>> ", data);
+        return JSON.stringify(data);
+      }
       default:
         break;
     }
@@ -35,7 +43,7 @@ const FunctionCalling = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col items-center bg-white">
+    <div className="flex flex-col items-center w-full h-full bg-white">
       <div className="w-full h-full">
         <Chat functionCallHandler={functionCallHandler} />
       </div>
