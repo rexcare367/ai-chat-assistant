@@ -11,87 +11,11 @@ import React, {
 import { useParams } from "next/navigation";
 import styles from "./chat.module.css";
 import { AssistantStream } from "openai/lib/AssistantStream";
-import Markdown from "react-markdown";
 // @ts-expect-error - no types for this yet
 import { AssistantStreamEvent } from "openai/resources/beta/assistants/assistants";
 import { RequiredActionFunctionToolCall } from "openai/resources/beta/threads/runs/runs";
 import { PaperclipIcon, ArrowUpIcon, LoaderIcon } from "./icons";
-
-type MessageProps = {
-  role: "user" | "assistant" | "code";
-  content: any;
-};
-
-const UserMessage = ({ content }: any) => {
-  return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "flex-start",
-        alignItems: "end",
-        flexDirection: "column",
-      }}
-    >
-      {content &&
-        content.map((item, index) => {
-          if (item.type === "text") {
-            return (
-              <p className={styles.userMessage} key={index}>
-                {item.text}
-              </p>
-            );
-          } else if (item.type === "image_url") {
-            return (
-              <img
-                style={{
-                  width: "60px",
-                  height: "60px",
-                }}
-                key={index}
-                src={item.image_url.url}
-                alt="user upload"
-              />
-            );
-          }
-          return null;
-        })}
-    </div>
-  );
-};
-
-const AssistantMessage = ({ text }: { text: string }) => {
-  return (
-    <div className={styles.assistantMessage}>
-      <Markdown>{text}</Markdown>
-    </div>
-  );
-};
-
-const CodeMessage = ({ text }: { text: string }) => {
-  return (
-    <div className={styles.codeMessage}>
-      {text.split("\n").map((line, index) => (
-        <div key={index}>
-          <span>{`${index + 1}. `}</span>
-          {line}
-        </div>
-      ))}
-    </div>
-  );
-};
-
-const Message = ({ role, content }: MessageProps) => {
-  switch (role) {
-    case "user":
-      return <UserMessage content={content} />;
-    case "assistant":
-      return <AssistantMessage text={content[0].text} />;
-    case "code":
-      return <CodeMessage text={content[0].text} />;
-    default:
-      return null;
-  }
-};
+import Message from "./message";
 
 type ChatProps = {
   functionCallHandler?: (
@@ -190,7 +114,6 @@ const Chat = ({
   const loadChat = async () => {
     const res = await fetch(`/api/chat-history/chat/${a_ssistantId}`);
     const chats = await res.json();
-    console.log("chats :>> ", chats);
     let _messages = [];
     chats.forEach((chat) => {
       const attachments = JSON.parse(chat.attachments);
@@ -211,7 +134,7 @@ const Chat = ({
         })),
       ];
     });
-    console.log("_messages :>> ", _messages);
+    console.log("_messages :>> ", _messages.length);
     if (_messages.length) setMessages(_messages);
     setLastIndex(_messages.length);
   };

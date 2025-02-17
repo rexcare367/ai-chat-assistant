@@ -55,13 +55,15 @@ export async function POST(_request) {
         type: "function",
         function: {
           name: "liveWebSearch",
-          description: "Get the latest information to answer user's question",
+          description:
+            "Retrieve the most up-to-date information from the web to provide accurate answers to the user's inquiries.",
           parameters: {
             type: "object",
             properties: {
               query: {
                 type: "string",
-                description: "all of user's meesage",
+                description:
+                  "The complete text of the user's question or request for information.",
               },
             },
             required: ["query"],

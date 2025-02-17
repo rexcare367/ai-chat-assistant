@@ -5,7 +5,8 @@ export async function GET(_request, { params: { userId } }) {
   const { data: assistants } = await supabase
     .from("assistants")
     .select()
-    .eq("clerk_id", userId);
+    .eq("clerk_id", userId)
+    .order("created_at", { ascending: false });
 
   return Response.json(assistants);
 }

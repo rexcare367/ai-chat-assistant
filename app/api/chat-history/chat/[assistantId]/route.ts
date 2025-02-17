@@ -6,7 +6,8 @@ export async function GET(_request, { params: { assistantId } }) {
   const { data: chats } = await supabase
     .from("chats")
     .select()
-    .eq("assistant_id", assistantId);
+    .eq("assistant_id", assistantId)
+    .order("created_at", { ascending: true });
 
   return Response.json(chats);
 }
