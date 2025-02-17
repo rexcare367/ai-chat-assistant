@@ -262,6 +262,7 @@ const Chat = ({
   };
 
   const handleSubmit = async (e) => {
+    if (inputDisabled) return;
     e.preventDefault();
     if (!userInput.trim()) return;
     let content: any = [{ type: "text", text: userInput }];

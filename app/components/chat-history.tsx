@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 import styles from "./chat-history.module.css";
 import { LoaderIcon, PlusIcon, AttachmentIcon } from "./icons";
@@ -11,6 +12,7 @@ const ChatHistory = () => {
   const [history, setHistory] = useState([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const router = useRouter();
   const { userId } = useAuth();
 
   useEffect(() => {
@@ -24,7 +26,6 @@ const ChatHistory = () => {
   const fetchHistory = async () => {
     const resp = await fetch(`/api/chat-history/${userId}`);
     const assistants = await resp.json();
-    console.log("assistants :>> ", assistants);
     setHistory(assistants);
   };
 
@@ -48,9 +49,10 @@ const ChatHistory = () => {
       body: JSON.stringify({ assistantId, threadId }),
     });
 
+    await fetchHistory();
     setIsLoading(false);
 
-    await fetchHistory();
+    router.push(`/chat/all/${assistantId}/${threadId}`);
   };
 
   return (

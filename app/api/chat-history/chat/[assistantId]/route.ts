@@ -2,7 +2,7 @@ import { createClient } from "../../../../utils/supabase/server";
 
 export async function GET(_request, { params: { assistantId } }) {
   const supabase = await createClient();
-  console.log("assistantId :>> ", assistantId);
+
   const { data: chats } = await supabase
     .from("chats")
     .select()
@@ -20,8 +20,6 @@ export async function POST(request, { params: { assistantId } }) {
     attachments: JSON.stringify(attachments),
     assistant_id: assistantId,
   });
-
-  console.log("chat :>> ", chat);
 
   return Response.json(chat);
 }

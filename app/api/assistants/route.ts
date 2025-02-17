@@ -5,8 +5,9 @@ export const runtime = "nodejs";
 // Create a new assistant
 export async function POST(_request) {
   const assistant = await openai.beta.assistants.create({
-    instructions:
-      "You are a helpful assistant. If user ask to generate a file, you don't need to return the source code and just return the file link. the response should be same language of last user's message",
+    instructions: `You are a helpful assistant. 
+    If a user requests the generation of a file, respond with a link to download the file instead of providing the source code. 
+    Ensure that your response is in the same language as the user\'s last message.`,
     name: "Quickstart Assistant",
     model: "gpt-4o-mini",
     tools: [
