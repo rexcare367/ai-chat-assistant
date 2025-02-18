@@ -27,13 +27,9 @@
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid #ececf1;
-  gap: 16px;
   width: 100%;
 }
 
-.fileName {
-  flex-grow: 1;
-}
 .fileStatus {
   font-size: 0.8em;
   color: #666;
@@ -66,7 +62,8 @@
 }
 
 .fileName {
-  width: 100%;
+  flex-grow: 1;
+  width: 88%;
   display: flex;
   flex-direction: column;
 }

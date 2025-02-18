@@ -1,3 +1,4 @@
+import { openai } from "@/app/openai";
 import { createClient } from "../../../utils/supabase/server";
 
 export async function GET(_request, { params: { userId } }) {
@@ -29,6 +30,8 @@ export async function DELETE(request, { params: { userId } }) {
   const supabase = await createClient();
 
   const { assistantId } = await request.json();
+
+  await openai.beta.assistants.del(assistantId);
 
   await supabase
     .from("assistants")

@@ -21,11 +21,13 @@ const FileItem = ({ fetchFiles, file }) => {
   return (
     <div className={styles.fileEntry}>
       <div className={styles.fileName}>
-        <span className={styles.fileName}>{file.filename}</span>
+        <span title={file.filename} className={`truncate ...`}>
+          {file.filename}
+        </span>
         <span className={styles.fileStatus}>{file.status}</span>
       </div>
       <span
-        className="cursor-pointer"
+        className="cursor-pointer rounded-full p-2 bg-white hover:bg-gray-300"
         onClick={() => handleFileDelete(file.file_id)}
       >
         {!isDeleting ? (

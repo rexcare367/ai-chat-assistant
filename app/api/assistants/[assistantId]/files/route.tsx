@@ -45,10 +45,10 @@ export async function GET(_request, { params: { assistantId } }) {
         };
       })
     );
-    return Response.json(filesArray);
+    return Response.json({ code: 200, data: filesArray });
   } catch (error) {
     console.log("error.message :>> ", error.message);
-    return Response.json([]);
+    return Response.json({ code: 404, data: [] });
   }
 }
 

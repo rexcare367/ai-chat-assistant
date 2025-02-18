@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import styles from "./file-viewer.module.css";
 import { LoaderIcon, UploadIcon, FileIcon, AttachmentIcon } from "./icons";
 import FileItem from "./file-item";
 
 const FileViewer = () => {
+  const router = useRouter();
   const { slug } = useParams();
   const a_ssistantId = slug ? slug[0] : "";
   const a_threadId = slug ? slug[1] : "";
@@ -26,7 +27,11 @@ const FileViewer = () => {
       const resp = await fetch(`/api/assistants/${a_ssistantId}/files`, {
         method: "GET",
       });
-      const data = await resp.json();
+      const { code, data } = await resp.json();
+      if (code !== 200) {
+        router.push("/chat/all");
+      }
+      console.log("data :>> ", data);
       setFiles(data);
     }
   };
