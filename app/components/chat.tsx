@@ -89,7 +89,7 @@ const Chat = ({
     async (event: ChangeEvent<HTMLInputElement>) => {
       const files = Array.from(event.target.files || []);
 
-      setUploadQueue(files.map((file) => file.name));
+      await setUploadQueue(files.map((file) => file.name));
 
       try {
         const uploadPromises = files.map((file) => uploadImage(file));
@@ -439,6 +439,17 @@ const Chat = ({
             />
           );
         })}
+        {uploadQueue &&
+          uploadQueue.map((filename, i) => {
+            return (
+              <div
+                className="w-[60px] h-[60px] rounded-md transition-all animate-pulse bg-slate-200"
+                key={i}
+              >
+                {filename}
+              </div>
+            );
+          })}
       </div>
       {a_ssistantId && (
         <div className="flex flex-row gap-2 relative">

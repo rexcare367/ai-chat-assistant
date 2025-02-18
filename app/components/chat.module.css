@@ -53,6 +53,8 @@
   order: 2;
   display: flex;
   padding: 2px 20px;
+  gap: 8px;
+  font-size: 12px;
 }
 
 .messages {
