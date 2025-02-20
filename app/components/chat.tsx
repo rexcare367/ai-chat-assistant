@@ -161,12 +161,9 @@ const Chat = ({
         }),
       }
     );
-    try {
-      const stream = AssistantStream.fromReadableStream(response.body);
-      handleReadableStream(stream);
-    } catch (error) {
-      console.log("error :>> ", error);
-    }
+
+    const stream = AssistantStream.fromReadableStream(response.body);
+    handleReadableStream(stream);
   };
 
   const submitActionResult = async (runId: string, toolCallOutputs: any) => {
@@ -183,12 +180,8 @@ const Chat = ({
         }),
       }
     );
-    try {
-      const stream = AssistantStream.fromReadableStream(response.body);
-      handleReadableStream(stream);
-    } catch (error) {
-      console.log("error :>> ", error);
-    }
+    const stream = AssistantStream.fromReadableStream(response.body);
+    handleReadableStream(stream);
   };
 
   const handleSubmit = async (e: any) => {
@@ -293,7 +286,6 @@ const Chat = ({
 
     // events without helpers yet (e.g. requires_action and run.done)
     stream.on("event", (event) => {
-      console.log("event :>> ", event);
       if (event.event === "thread.run.requires_action")
         handleRequiresAction(event);
       if (event.event === "thread.run.completed") {
