@@ -161,9 +161,12 @@ const Chat = ({
         }),
       }
     );
-
-    const stream = AssistantStream.fromReadableStream(response.body);
-    handleReadableStream(stream);
+    try {
+      const stream = AssistantStream.fromReadableStream(response.body);
+      handleReadableStream(stream);
+    } catch (error) {
+      console.log("error :>> ", error);
+    }
   };
 
   const submitActionResult = async (runId: string, toolCallOutputs: any) => {
@@ -180,8 +183,12 @@ const Chat = ({
         }),
       }
     );
-    const stream = AssistantStream.fromReadableStream(response.body);
-    handleReadableStream(stream);
+    try {
+      const stream = AssistantStream.fromReadableStream(response.body);
+      handleReadableStream(stream);
+    } catch (error) {
+      console.log("error :>> ", error);
+    }
   };
 
   const handleSubmit = async (e: any) => {
