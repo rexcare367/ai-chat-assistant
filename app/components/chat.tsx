@@ -202,11 +202,12 @@ const Chat = ({
     setInputDisabled(true);
     sendMessage(content);
     setMessages((prevMessages) => [...prevMessages, { role: "user", content }]);
-    await storeChat("user", userInput, attachments);
-    setLastIndex((prevLastIndex) => prevLastIndex + 1);
     setUserInput("");
     setAttachments([]);
     scrollToBottom();
+
+    await storeChat("user", userInput, attachments);
+    setLastIndex((prevLastIndex) => prevLastIndex + 1);
   };
 
   /* Stream Event Handlers */
