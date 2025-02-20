@@ -150,7 +150,7 @@ const Chat = ({
     });
   };
 
-  const sendMessage = async (content) => {
+  const sendMessage = async (content: any) => {
     setIsWaitingResponse(true);
     const response = await fetch(
       `/api/assistants/${a_ssistantId}/threads/${a_threadId}/messages`,
@@ -166,7 +166,7 @@ const Chat = ({
     handleReadableStream(stream);
   };
 
-  const submitActionResult = async (runId, toolCallOutputs) => {
+  const submitActionResult = async (runId: string, toolCallOutputs: any) => {
     const response = await fetch(
       `/api/assistants/${a_ssistantId}/threads/${a_threadId}/actions`,
       {
@@ -184,7 +184,7 @@ const Chat = ({
     handleReadableStream(stream);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: any) => {
     if (inputDisabled) return;
     e.preventDefault();
     if (!userInput.trim()) return;
@@ -220,7 +220,7 @@ const Chat = ({
   };
 
   // textDelta - append text to last assistant message
-  const handleTextDelta = (delta) => {
+  const handleTextDelta = (delta: any) => {
     if (delta.value != null) {
       appendToLastMessage(delta.value);
     }
@@ -230,19 +230,19 @@ const Chat = ({
   };
 
   // imageFileDone - show image in chat
-  const handleImageFileDone = (image) => {
+  const handleImageFileDone = (image: any) => {
     appendToLastMessage(`\n![${image.file_id}](/api/files/${image.file_id})\n`);
   };
 
   // toolCallCreated - log new tool call
-  const toolCallCreated = (toolCall) => {
+  const toolCallCreated = (toolCall: any) => {
     console.log("toolCall :>> ", toolCall);
     if (toolCall.type != "code_interpreter") return;
     appendMessage("code", "");
   };
 
   // toolCallDelta - log delta and snapshot for the tool call
-  const toolCallDelta = (delta, snapshot) => {
+  const toolCallDelta = (delta: any, snapshot: any) => {
     console.log("toolCallDelta :>> ", delta, snapshot);
     if (delta.type != "code_interpreter") return;
     if (!delta.code_interpreter.input) return;
@@ -286,6 +286,7 @@ const Chat = ({
 
     // events without helpers yet (e.g. requires_action and run.done)
     stream.on("event", (event) => {
+      console.log("event :>> ", event);
       if (event.event === "thread.run.requires_action")
         handleRequiresAction(event);
       if (event.event === "thread.run.completed") {
@@ -318,7 +319,7 @@ const Chat = ({
     =======================
   */
 
-  const appendToLastMessage = (text) => {
+  const appendToLastMessage = (text: string) => {
     setMessages((prevMessages) => {
       const lastMessage = prevMessages[prevMessages.length - 1];
       const updatedLastMessage = {
@@ -329,20 +330,20 @@ const Chat = ({
     });
   };
 
-  const appendMessage = (role, text) => {
+  const appendMessage = (role: string, text: string) => {
     setMessages((prevMessages) => [
       ...prevMessages,
       { role, content: [{ type: "text", text }] },
     ]);
   };
 
-  const annotateLastMessage = (annotations) => {
+  const annotateLastMessage = (annotations: any) => {
     setMessages((prevMessages) => {
       const lastMessage = prevMessages[prevMessages.length - 1];
       const updatedLastMessage = {
         ...lastMessage,
       };
-      annotations.forEach((annotation) => {
+      annotations.forEach((annotation: any) => {
         if (annotation.type === "file_path") {
           updatedLastMessage.content[0].text =
             updatedLastMessage.content[0].text.replaceAll(
