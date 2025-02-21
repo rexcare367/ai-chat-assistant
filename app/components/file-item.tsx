@@ -6,11 +6,11 @@ import { useParams } from "next/navigation";
 const FileItem = ({ fetchFiles, file }) => {
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const { slug } = useParams();
-  const assistantId = slug[0];
+  const a_ssistantId = slug ? slug[0] : "";
 
   const handleFileDelete = async (fileId: string) => {
     setIsDeleting(true);
-    await fetch(`/api/assistants/${assistantId}/files`, {
+    await fetch(`/api/assistants/${a_ssistantId}/files`, {
       method: "DELETE",
       body: JSON.stringify({ fileId }),
     });

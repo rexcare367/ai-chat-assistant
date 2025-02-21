@@ -33,7 +33,7 @@ const FileViewer = () => {
       }
 
       setFiles(data);
-    }
+    } else setFiles([]);
   };
 
   const handleFileUpload = async (event: any) => {
