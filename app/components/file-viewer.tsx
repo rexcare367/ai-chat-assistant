@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import styles from "./file-viewer.module.css";
 import { LoaderIcon, UploadIcon, FileIcon, AttachmentIcon } from "./icons";
@@ -8,7 +8,7 @@ const FileViewer = () => {
   const router = useRouter();
   const { slug } = useParams();
   const a_ssistantId = slug ? slug[0] : "";
-  const a_threadId = slug ? slug[1] : "";
+  // const a_threadId = slug ? slug[1] : "";
 
   const [files, setFiles] = useState([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -31,7 +31,7 @@ const FileViewer = () => {
       if (code !== 200) {
         router.push("/chat/all");
       }
-      console.log("data :>> ", data);
+
       setFiles(data);
     }
   };
@@ -40,7 +40,20 @@ const FileViewer = () => {
     setIsUploading(true);
     const data = new FormData();
     if (event.target.files.length < 0) return;
-    data.append("file", event.target.files[0]);
+
+    const newFile = event.target.files[0];
+
+    const isDuplicate = files.some((file) => {
+      return file.filename === newFile.name;
+    });
+
+    if (isDuplicate) {
+      alert("File with the same name already exists.");
+      setIsUploading(false);
+      return;
+    }
+
+    data.append("file", newFile);
     await fetch(`/api/assistants/${a_ssistantId}/files`, {
       method: "POST",
       body: data,
@@ -48,6 +61,11 @@ const FileViewer = () => {
     await fetchFiles();
     setIsUploading(false);
   };
+
+  const isDisabled = useMemo(
+    () => isUploading || !a_ssistantId || isLoading,
+    [isUploading, a_ssistantId, isLoading]
+  );
 
   return (
     <div className={styles.fileViewer}>
@@ -83,7 +101,7 @@ const FileViewer = () => {
           className={`flex flex-row items-center gap-2 ${
             styles.fileUploadBtn
           } ${
-            isUploading
+            isDisabled
               ? "bg-black/40 cursor-default"
               : "bg-black cursor-pointer"
           }`}
@@ -103,8 +121,9 @@ const FileViewer = () => {
           name="file-upload"
           className={styles.fileUploadInput}
           multiple
+          onClick={(e: any) => (e.target.value = null)}
           onChange={handleFileUpload}
-          disabled={isUploading}
+          disabled={isDisabled}
           accept=".c,.cpp,.cs,.css,.doc,.docx,.go,.html,.java,.js,.json,.md,.pdf,.php,.pptx,.py,.rb,.sh,.tex,.ts,.txt"
         />
       </div>
